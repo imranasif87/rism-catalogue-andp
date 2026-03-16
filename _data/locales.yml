@@ -34,10 +34,21 @@
     de: "Geben Sie einen Suchbegriff ein ..."
     fr: "Entrez un terme de recherche ..."
     it: "Inserisci un termine di ricerca ..."
-- id: search-facet1
+- id: search-facet-key-mode
   name:
     en: "Key"
     de: "Tonart"
     fr: "Tonalité"
     it: "Tonalita"
-
+- id: search-facet-relationship
+  name:
+    en: "Relationship"
+    de: "Beziehung"
+    fr: "Relation"
+    it: "Relazione"
+- id: search-facet-subject
+  name:
+    en: "Form of the work"
+    de: "Werkgattung"
+    fr: "Forme de l'œuvre"
+    it: "Forma dell'opera"
