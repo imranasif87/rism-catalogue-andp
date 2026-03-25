@@ -20,6 +20,6 @@ lang_from_path: false
 sass:
   sourcemap: never
 
-theme: rism-catalog-theme
+remote_theme: rism-digital/rism-catalog-theme
 
 rism_catalog: "publications/50007446"
