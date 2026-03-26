@@ -40,11 +40,8 @@ jobs:
       fail-fast: false
       matrix:
         catalog:
-          - repo: rism-digital/rism-catalog-andp
+          - repo: imranasif87/rism-catalogue-andp
             target: AndP
-          - repo: rism-digital/rism-catalog-bacch
-            target: BacCh
-
     steps:
       - name: Checkout catalog repository
         if: >
