@@ -1,45 +1,207 @@
-name: Build and Deploy Jekyll
+name: Build and deploy catalogs.rism.online
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+
   workflow_dispatch:
+    inputs:
+      catalog:
+        description: Catalog to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - AndP
+          - BacCh
+      deploy:
+        description: Deploy to GitHub Pages
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: catalogs-pages
+  cancel-in-progress: true
+
+env:
+  RUBY_VERSION: "3.2"
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        catalog:
+          - repo: rism-digital/rism-catalog-andp
+            target: AndP
+          - repo: rism-digital/rism-catalog-bacch
+            target: BacCh
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout catalog repository
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.catalog.repo }}
+          path: source
+          # token: ${{ secrets.CATALOGS_READ_TOKEN }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
         with:
-          ruby-version: '3.2'
-          bundler-cache: true
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: false
 
-      - name: Install dependencies
-        run: bundle install
+      - name: Install gems
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        working-directory: source
+        run: |
+          bundle config set path vendor/bundle
+          bundle install --jobs 4 --retry 3
 
-      - name: Build site
+      - name: Index
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        working-directory: source
+        run: bundle exec jekyll load-data
+        env:
+          JEKYLL_ENV: production
+
+      - name: Build with Jekyll
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        working-directory: source
+        run: bundle exec jekyll build --baseurl "/${{ matrix.catalog.target }}"
+        env:
+          JEKYLL_ENV: production
+          PAGES_REPO_NWO: ${{ matrix.catalog.repo }}
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Stage output
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        run: |
+          mkdir -p "out/${{ matrix.catalog.target }}"
+          cp -R source/_site/. "out/${{ matrix.catalog.target }}/"
+
+      - name: Upload catalog artifact
+        if: >
+          github.event_name == 'push' ||
+          inputs.catalog == 'all' ||
+          inputs.catalog == matrix.catalog.target
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-${{ matrix.catalog.target }}
+          path: out/${{ matrix.catalog.target }}
+          if-no-files-found: error
+
+  build-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: false
+
+      - name: Install gems
+        working-directory: source
+        run: |
+          bundle config set path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Index
+        working-directory: source
+        run: bundle exec jekyll load-data
+        env:
+          JEKYLL_ENV: production
+
+      - name: Build with Jekyll
+        working-directory: source
         run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload main site artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: ./_site
+          name: main-site
+          path: source/_site
+          if-no-files-found: error
 
   deploy:
+    needs: [build, build-main]
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       inputs.catalog == 'all' &&
+       inputs.deploy == true)
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
+
     steps:
+      - name: Download all catalog artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: site-artifacts
+
+      - name: Download main site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: main-site
+          path: site-artifacts/main-site
+
+      - name: Assemble final Pages site
+        run: |
+          mkdir -p public
+          # Copy main site to root
+          cp -R site-artifacts/main-site/. public/
+          # Copy catalogs to subdirs
+          for dir in site-artifacts/catalog-*; do
+            name="$(basename "$dir" | sed 's/^catalog-//')"
+            mkdir -p "public/$name"
+            cp -R "$dir"/. "public/$name/"
+          done
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
