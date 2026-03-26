@@ -2,7 +2,7 @@
 
 Edited by Sara Andreacchio, Claudio Bacciagaluppi, Gigliola Di Grazia and Leonardo Miucci. Bern, HKB/RISM Digital Center, 2025.
 
-Work catalogs in RISM Online, No. 1
+Work catalogs in RISM Online, No. 1 (DOI: [10.5448/rism-catalogs-001](https://doi.org/10.5448/rism-catalogs-001))
 
 [https://www.hkb-interpretation.ch/francescopollini](https://www.hkb-interpretation.ch/francescopollini)
 
