@@ -6,9 +6,10 @@ title_mobile:
   it: Opere di F. Pollini (AndP)
 
 email: info@rism.digital
-baseurl: ""
-version: 0.9.0
-doi: 10.5281/zenodo.19232872
+url: https://catalogs.rism.online
+baseurl: "/AndP"
+version: 1.0.0
+doi: 10.5448/rism-catalogs-001
 
 sponsors:
   - url: https://fr.wikipedia.org/wiki/Licence_Creative_Commons
