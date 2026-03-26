@@ -23,7 +23,7 @@ lang_from_path: false
 sass:
   sourcemap: never
 
-remote_theme: rism-digital/rism-catalog-theme
+theme: rism-catalog-theme
 
 plugins:
   - jekyll-github-metadata
