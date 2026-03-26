@@ -27,5 +27,6 @@ theme: rism-catalog-theme
 
 plugins:
   - jekyll-github-metadata
+  - jekyll-rism-online-renderer
 
 rism_catalog: "publications/50007446"
