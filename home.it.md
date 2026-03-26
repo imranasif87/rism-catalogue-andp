@@ -11,3 +11,4 @@ Il presente catalogo tematico delle opere di Francesco Pollini nasce con l’obi
 
 La pubblicazione fa parte dei risultati della ricerca compiuta all’interno del progetto [Francesco Pollini e la prima tradizione pianistica italiana](https://www.hkb-interpretation.ch/projekte/francesco-pollini-and-the-early-italian-piano-tradition) (Fondo Nazionale Svizzero per la Ricerca Scientifica, n. [182222](https://data.snf.ch/grants/grant/182222), 2019-2022). Le singole schede sono state create utilizzando il software Muscat, lo strumento della banca-dati RISM, e la pubblicazione è stata realizzata grazie al RISM Digital Center di Berna. Una lista di tutte le fonti attualmente note per le composizioni di Francesco Pollini, manoscritte o a stampa fino a circa il 1900, sviluppata nell’ambito della redazione del catalogo, si trova su [Zenodo](https://doi.org/10.5281/zenodo.7021701).  
 
+{% include theme-info.md %}

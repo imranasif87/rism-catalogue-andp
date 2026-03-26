@@ -11,3 +11,6 @@ This thematic catalog of Francesco Pollini's works was created with the aim of o
 
 The publication is part of the results of research carried out within the project [Francesco Pollini and the early Italian piano tradition](https://www.hkb-interpretation.ch/projekte/francesco-pollini-and-the-early-italian-piano-tradition) (Swiss National Science Foundation, no. [182222](https://data.snf.ch/grants/grant/182222), 2019-2022). The individual entries were created using Muscat software, the RISM database tool, and the publication was made possible thanks to the RISM Digital Centre in Bern. A list of all currently known sources for Francesco Pollini's compositions, both manuscript and printed, up to around 1900, compiled as part of the catalog, can be found on [Zenodo](https://doi.org/10.5281/zenodo.7021701).  
 
+---
+
+{% include theme-info.md %}

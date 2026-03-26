@@ -1,6 +1,6 @@
 $rism-digital-center-primary: #1d3557;
 $primary: $rism-digital-center-primary;
-$link: $rism-digital-center-primary;
+$link: lighten($rism-digital-center-primary, 30%);
 $rism-digital-center-white: #fff;
 
 // navbar

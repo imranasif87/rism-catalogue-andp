@@ -1,7 +1,7 @@
 ---
 title: Introduction
 layout: introduction
-lang: en
+lang: it
 permalink: /introduction.html
 ---
 
