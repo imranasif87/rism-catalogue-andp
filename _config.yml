@@ -1,9 +1,9 @@
 title: 
- en: Catalog of the Works of Francesco Pollini (AndP)
- it: Catalogo delle opere di Francesco Pollini (AndP)
+ en: Catalog of the Works of Henry Purcell (ZimP)
+ it: Catalogo delle opere di Henry Purcell (ZimP)
 title_mobile: 
-  en: Works of F. Pollini (AndP)
-  it: Opere di F. Pollini (AndP)
+  en: Works of Henry Purcell (ZimP)
+  it: Opere di Henry Purcell (ZimP)
 
 email: info@rism.digital
 url: https://imranasif87.github.io
@@ -28,6 +28,5 @@ theme: rism-catalog-theme
 
 plugins:
   - jekyll-github-metadata
-  - jekyll-rism-online-renderer
 
-rism_catalog: "publications/50007446"
+rism_catalog: "publications/123"
