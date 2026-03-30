@@ -1,0 +1,56 @@
+{% assign search_title = site.data.locales | where: "id", "search-title" | first %}
+{% assign search_input = site.data.locales | where: "id", "search-input" | first %}
+{% assign search_facet_key_mode = site.data.locales | where: "id", "search-facet-key-mode" | first %}
+{% assign search_facet_relationship = site.data.locales | where: "id", "search-facet-relationship" | first %}
+{% assign search_facet_subject = site.data.locales | where: "id", "search-facet-subject" | first %}
+{% assign facet_config = site.data.search_config %}
+{% assign excluded_facets = facet_config.exclude | default: empty %}
+
+<h1>{{ search_title.name[site.active_lang] }}</h1>
+<div id="website-search-form">
+    {% assign action = "search.html"  %}
+    <form id="search-form" action="{{ action }}" data-excluded-facets='{{ excluded_facets | jsonify }}'>
+        <div class="field">
+            <div class="control">
+                <input id="website-search" class="input is-small" type="text" name="q" placeholder="{{ search_input.name[site.active_lang] }} ... Mana ">
+            </div>
+        </div>
+
+        <button type="submit" class="button is-small is-dark">
+            <span class="icon is-small">
+                <i class="fas fa-search"></i>
+            </span>
+        </button>
+
+        {% unless excluded_facets contains "keyMode" %}
+        <h2 class="mt-3">{{ search_facet_key_mode.name[site.active_lang] }}</h2>
+
+        <div id="facet-key-mode" class="mt-2 scroll-facet"></div>
+        {% endunless %}
+
+        {% unless excluded_facets contains "relationship" %}
+        <h2 class="mt-3">{{ search_facet_relationship.name[site.active_lang] | default: "Relationship" }}</h2>
+
+        <div id="facet-relationship" class="mt-2 scroll-facet"></div>
+        {% endunless %}
+
+        {% unless excluded_facets contains "subject" %}
+        <h2 class="mt-3">{{ search_facet_subject.name[site.active_lang] | default: "Subject" }}</h2>
+
+        <div id="facet-subject" class="mt-2 scroll-facet"></div>
+        {% endunless %}
+
+        {% unless excluded_facets contains "dateRange" %}
+        <h2 class="mt-3">Date range</h2>
+        <div class="field is-grouped mt-2">
+            <div class="control is-expanded">
+                <input id="facet-date-from" class="input is-small" type="text" name="dateFrom" inputmode="numeric">
+            </div>
+            <div class="control is-expanded">
+                <input id="facet-date-to" class="input is-small" type="text" name="dateTo" inputmode="numeric">
+            </div>
+        </div>
+        {% endunless %}
+
+    </form>
+</div>
