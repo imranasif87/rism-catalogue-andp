@@ -1,4 +1,4 @@
-# Forking and Running the RISM Catalogue (Pollini) – A Troubleshooting Story
+# Forking and Running the RISM Catalogue (Pollini) : A Troubleshooting Story
 
 This repository documents the steps required to successfully fork and deploy a RISM catalogue site based on the Pollini example. The process was not straightforward — several build errors appeared, and each required investigation and fixes. This guide tells the story step-by-step so future users can avoid the same issues.
 
