@@ -3,6 +3,7 @@
 {% assign search_facet_key_mode = site.data.locales | where: "id", "search-facet-key-mode" | first %}
 {% assign search_facet_relationship = site.data.locales | where: "id", "search-facet-relationship" | first %}
 {% assign search_facet_subject = site.data.locales | where: "id", "search-facet-subject" | first %}
+{% assign search_facet_scoring_summary = site.data.locales | where: "id", "search-facet-scoring-summary" | first %}
 {% assign facet_config = site.data.search_config %}
 {% assign excluded_facets = facet_config.exclude | default: empty %}
 
@@ -26,6 +27,12 @@
         <h2 class="mt-3">{{ search_facet_key_mode.name[site.active_lang] }}</h2>
 
         <div id="facet-key-mode" class="mt-2 scroll-facet"></div>
+        {% endunless %}
+
+        {% unless excluded_facets contains "scoringSummary" %}
+        <h2 class="mt-3">{{ search_facet_scoring_summary.name[site.active_lang] | default: "Scoring" }}</h2>
+        
+        <div id="facet-scoring-summary" class="mt-2 scroll-facet"></div>
         {% endunless %}
 
         {% unless excluded_facets contains "relationship" %}
