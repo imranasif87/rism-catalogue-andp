@@ -29,4 +29,5 @@ theme: rism-catalog-theme
 plugins:
   - jekyll-github-metadata
 
-rism_catalog: "publications/123"
+# rism_catalog: "publications/123"  # This is Henry Purcell
+rism_catalog: "publications/50007446"  # This is Francesco Pollini 
