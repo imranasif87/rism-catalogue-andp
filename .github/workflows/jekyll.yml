@@ -1,63 +1,84 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
 name: Deploy Jekyll site to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      force_reindex:
+        description: 'Force re-indexing even if _config.yml unchanged'
+        type: boolean
+        default: false
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Needed to compare HEAD~1 vs HEAD for changed files
+
       - name: Setup Ruby
-        # https://github.com/ruby/setup-ruby/releases/tag/v1.207.0
         uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
         with:
-          ruby-version: '3.2' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
+          ruby-version: '3.2'
+          bundler-cache: true
+          cache-version: 0
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+
+      - name: Check if re-indexing is needed
+        id: index_check
+        run: |
+          # Always index if index file doesn't exist yet
+          if [ ! -f "index/index.json" ]; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "→ Reason: index/index.json missing, must index"
+            exit 0
+          fi
+
+          # Always index if manually requested via workflow_dispatch input
+          if [ "${{ github.event.inputs.force_reindex }}" = "true" ]; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "→ Reason: force_reindex requested manually"
+            exit 0
+          fi
+
+          # Only index if _config.yml was changed in this push
+          if git diff HEAD~1 HEAD --name-only | grep -q '_config.yml'; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "→ Reason: _config.yml changed, re-indexing"
+          else
+            echo "needed=false" >> $GITHUB_OUTPUT
+            echo "→ Reason: _config.yml unchanged, skipping indexing"
+          fi
+
       - name: Index
-        # Outputs to the './_site' directory by default
+        if: steps.index_check.outputs.needed == 'true'
         run: bundle exec jekyll load-data
         env:
           JEKYLL_ENV: production
+
       - name: Build with Jekyll
-        # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+
       - name: Upload artifact
-        # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v3
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages
