@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       force_reindex:
-        description: 'Force re-indexing even if _config.yml unchanged'
+        description: 'Force re-indexing even if catalog ID unchanged'
         type: boolean
         default: false
 
@@ -25,8 +25,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2  # Needed to compare HEAD~1 vs HEAD for changed files
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
@@ -39,34 +37,25 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Check if re-indexing is needed
-        id: index_check
+      - name: Extract catalog ID for cache key
+        id: catalog_id
         run: |
-          # Always index if index file doesn't exist yet
-          if [ ! -f "index/index.json" ]; then
-            echo "needed=true" >> $GITHUB_OUTPUT
-            echo "→ Reason: index/index.json missing, must index"
-            exit 0
-          fi
+          CATALOG_ID=$(grep 'rism_catalog:' _config.yml | sed 's/.*rism_catalog: *//' | tr -d '"' | tr -d "'" | tr '/' '-')
+          echo "value=$CATALOG_ID" >> $GITHUB_OUTPUT
+          echo "→ Catalog ID: $CATALOG_ID"
 
-          # Always index if manually requested via workflow_dispatch input
-          if [ "${{ github.event.inputs.force_reindex }}" = "true" ]; then
-            echo "needed=true" >> $GITHUB_OUTPUT
-            echo "→ Reason: force_reindex requested manually"
-            exit 0
-          fi
-
-          # Only index if _config.yml was changed in this push
-          if git diff HEAD~1 HEAD --name-only | grep -q '_config.yml'; then
-            echo "needed=true" >> $GITHUB_OUTPUT
-            echo "→ Reason: _config.yml changed, re-indexing"
-          else
-            echo "needed=false" >> $GITHUB_OUTPUT
-            echo "→ Reason: _config.yml unchanged, skipping indexing"
-          fi
+      - name: Restore index cache
+        id: cache_index
+        if: github.event.inputs.force_reindex != 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            index/index.json
+            incipits/
+          key: rism-index-${{ steps.catalog_id.outputs.value }}
 
       - name: Index
-        if: steps.index_check.outputs.needed == 'true'
+        if: steps.cache_index.outputs.cache-hit != 'true' || github.event.inputs.force_reindex == 'true'
         run: bundle exec jekyll load-data
         env:
           JEKYLL_ENV: production
