@@ -79,7 +79,7 @@ we switched to:
 theme: rism-catalog-theme
 ```
 
-This allowed Bundler to load the theme locally, which resolved include path issues automatically.
+This allowed Bundler to load the theme, which resolved include path issues automatically.
 
 After this change, the site built successfully.
 
@@ -306,7 +306,7 @@ Crucially, `scoringSummary` is **already indexed** by the `load-data` command â€
 
 ---
 
-## The Approach: Override Theme Files Locally
+## The Approach: Override Theme Files
 
 Because the theme is a gem, its files cannot be edited directly. However, Jekyll has a well-defined override mechanism: **any file placed in your repository at the same path as a theme file takes precedence**.
 
