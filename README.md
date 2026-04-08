@@ -16,7 +16,7 @@ Follow these steps chronologically to fork, configure, and customize the catalog
 
 ### Phase A: Environment Setup & Troubleshooting
 
-1.  **Fork the repository:** Start by forking the base catalogue repository (e.g., the Pollini example).
+1.  **Fork the repository:** Start by forking the base catalogue repository (e.g., the [Pollini example](https://github.com/rism-digital/rism-catalog-andp)).
 2.  **Configure GitHub Pages:** Navigate to your repository settings and enable GitHub Pages, ensuring it is set to deploy via GitHub Actions.
 3.  **Create a custom workflow:** Create the file `.github/workflows/jekyll.yml` to handle Ruby installation, gem installation, Jekyll building, and deployment.
 4.  **Fix theme loading:** Open `_config.yml` and change the theme declaration from `remote_theme: rism-digital/rism-catalog-theme` to simply `theme: rism-catalog-theme`.
