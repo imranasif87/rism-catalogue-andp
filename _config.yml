@@ -1,9 +1,9 @@
 title: 
- en: Catalog of the Works of Henry Purcell (ZimP)
- it: Catalogo delle opere di Henry Purcell (ZimP)
+ en: Catalog of the Works of Edward Elgar (KenE)
+ it: Catalogo delle opere di Edward Elgar (KenE)
 title_mobile: 
-  en: Works of Henry Purcell (ZimP)
-  it: Opere di Henry Purcell (ZimP)
+  en: Works of Edward Elgar (KenE)
+  it: Opere di Edward Elgar (KenE)
 
 email: info@rism.digital
 url: https://imranasif87.github.io
@@ -29,4 +29,4 @@ theme: rism-catalog-theme
 plugins:
   - jekyll-github-metadata
 
-rism_catalog: "publications/123"
+rism_catalog: "publications/51004444"
