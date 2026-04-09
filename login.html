@@ -51,43 +51,62 @@ layout: null
 </head>
 <body>
   <div class="login-box">
-    <h1>RISM Catalogue AndP</h1>
-    <label for="username">Username</label>
-    <input type="text" id="username" placeholder="Enter username" autocomplete="username" />
+    <h1>RISM Catalogue Elgar</h1>
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="Enter email" autocomplete="username" />
     <label for="password">Password</label>
     <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
-    <button onclick="doLogin()">Login</button>
-    <p class="error" id="error-msg">Invalid username or password.</p>
+    <button id="loginBtn">Login</button>
+    <p class="error" id="error-msg">Invalid email or password.</p>
   </div>
 
-  <script>
-    // If already logged in, go straight to the site
-    if (sessionStorage.getItem('rism_auth') === 'true') {
-      window.location.href = '/rism-catalogue-andp/';
-    }
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-    // Define your credentials here
-    const VALID_USERS = [
-      { username: 'admin', password: 'rism2024' },
-      // Add more users as needed:
-      // { username: 'user2', password: 'pass2' }
-    ];
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0uIzpPDKbQ8adXtZ8ygmtp_W0TqRBF3s",
+      authDomain: "rism-catalogue.firebaseapp.com",
+      projectId: "rism-catalogue",
+      storageBucket: "rism-catalogue.firebasestorage.app",
+      messagingSenderId: "516935701443",
+      appId: "1:516935701443:web:a3ee0cc9a1c1db551de376",
+      measurementId: "G-YQELDQ7E26"
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // If already logged in, go straight to the site
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = '/rism-catalogue-andp/';
+      }
+    });
 
     function doLogin() {
-      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      const match = VALID_USERS.find(u => u.username === username && u.password === password);
-
-      if (match) {
-        sessionStorage.setItem('rism_auth', 'true');
-        const redirect = sessionStorage.getItem('rism_redirect') || '/rism-catalogue-andp/';
-        sessionStorage.removeItem('rism_redirect');
-        window.location.href = redirect;
-      } else {
-        document.getElementById('error-msg').style.display = 'block';
-      }
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Success! Redirect user
+          const redirect = sessionStorage.getItem('rism_redirect') || '/rism-catalogue-andp/';
+          sessionStorage.removeItem('rism_redirect');
+          window.location.href = redirect;
+        })
+        .catch((error) => {
+          // Failed login
+          document.getElementById('error-msg').style.display = 'block';
+          console.error("Login failed:", error.message);
+        });
     }
+
+    // Attach click event to button
+    document.getElementById('loginBtn').addEventListener('click', doLogin);
 
     // Allow pressing Enter to submit
     document.addEventListener('keydown', e => {
