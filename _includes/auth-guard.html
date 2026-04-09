@@ -1,18 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <style>
+      body { display: none; }
+    </style>
   </head>
   <body>
-    <script>
-      (function () {
-        var loginPath = '/rism-catalogue-andp/login.html';
-        var currentPath = window.location.pathname;
-        if (currentPath === loginPath || currentPath.endsWith('/login.html')) return;
-        if (sessionStorage.getItem('rism_auth') !== 'true') {
-          sessionStorage.setItem('rism_redirect', window.location.href);
-          window.location.replace(loginPath);
-        }
-      })();
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+      const firebaseConfig = {
+          apiKey: "AIzaSyD0uIzpPDKbQ8adXtZ8ygmtp_W0TqRBF3s",
+          authDomain: "rism-catalogue.firebaseapp.com",
+          projectId: "rism-catalogue",
+          storageBucket: "rism-catalogue.firebasestorage.app",
+          messagingSenderId: "516935701443",
+          appId: "1:516935701443:web:a3ee0cc9a1c1db551de376",
+          measurementId: "G-YQELDQ7E26"
+        };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      const loginPath = '/rism-catalogue-andp/login.html';
+      const currentPath = window.location.pathname;
+
+      // Only run the guard if we are NOT on the login page
+      if (currentPath !== loginPath && !currentPath.endsWith('/login.html')) {
+        
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            // User is authenticated! Show the page content.
+            document.body.style.display = 'block';
+          } else {
+            // User is NOT authenticated. Save where they tried to go, then redirect.
+            sessionStorage.setItem('rism_redirect', window.location.href);
+            window.location.replace(loginPath);
+          }
+        });
+
+      } else {
+        // If they are on the login page, make sure the body is visible
+        document.body.style.display = 'block';
+      }
     </script>
   </body>
 </html>
