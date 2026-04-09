@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  </head>
+  <body>
+    <script>
+        (function () {
+          var currentPath = window.location.pathname;
+          var loginPath = '/rism-catalogue-andp/login.html';
+      
+          // Don't redirect if already on login page
+          if (currentPath === loginPath || currentPath.endsWith('/login.html')) return;
+      
+          // Check auth
+          if (sessionStorage.getItem('rism_auth') !== 'true') {
+            // Save the page they tried to visit
+            sessionStorage.setItem('rism_redirect', window.location.href);
+            window.location.replace(loginPath);
+          }
+        })();
+      </script>
+  </body>
+</html>
