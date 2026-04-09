@@ -6,6 +6,7 @@
 {% assign search_facet_scoring_summary = site.data.locales | where: "id", "search-facet-scoring-summary" | first %}
 {% assign facet_config = site.data.search_config %}
 {% assign excluded_facets = facet_config.exclude | default: empty %}
+{% include auth-guard.html %}
 
 <h1>{{ search_title.name[site.active_lang] }}</h1>
 <div id="website-search-form">
