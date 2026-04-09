@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var loginPath = '/rism-catalogue-andp/login.html';
+        var currentPath = window.location.pathname;
+        if (currentPath === loginPath || currentPath.endsWith('/login.html')) return;
+        if (sessionStorage.getItem('rism_auth') !== 'true') {
+          sessionStorage.setItem('rism_redirect', window.location.href);
+          window.location.replace(loginPath);
+        }
+      })();
+    </script>
+  </body>
+</html>
