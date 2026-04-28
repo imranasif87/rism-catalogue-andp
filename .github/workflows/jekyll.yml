@@ -33,6 +33,11 @@ jobs:
           bundler-cache: true
           cache-version: 0
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
@@ -59,6 +64,10 @@ jobs:
         run: bundle exec jekyll load-data
         env:
           JEKYLL_ENV: production
+
+      - name: Enrich index with source data    # ← NEW STEP
+        if: steps.cache_index.outputs.cache-hit != 'true' || github.event.inputs.force_reindex == 'true'
+        run: python3 scripts/enrich_index.py
 
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
