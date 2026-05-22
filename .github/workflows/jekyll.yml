@@ -65,10 +65,6 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Enrich index with source data    # ← NEW STEP
-        if: steps.cache_index.outputs.cache-hit != 'true' || github.event.inputs.force_reindex == 'true'
-        run: python3 scripts/enrich_index.py
-
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
