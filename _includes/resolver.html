@@ -1,0 +1,185 @@
+<style>
+    .source-item {
+        margin-bottom: 24px;
+    }
+
+    /* The main container for the summary card */
+    .source-summary-card {
+        background-color: #f0f4fa;
+        /* Light blue tint matching the #1d3557 theme hue */
+        border: 1px solid #cfdaf0;
+        border-left: 6px solid #1d3557;
+        /* Thick left accent bar using the primary theme color */
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(29, 53, 87, 0.08);
+        /* Subtle shadow to elevate it from detailed sections */
+    }
+
+    /* NEW: Container label sitting at the very top of the summary card */
+    .source-summary-label {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #1d3557; /* Deep blue theme color */
+        background-color: rgba(29, 53, 87, 0.12); /* Subtle theme tint background pill */
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+
+    /* Stylized title header inside the card */
+    .source-summary-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1d3557;
+        /* Deep blue theme color */
+        margin-top: 2px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #cfdaf0;
+    }
+
+    /* Grid layout for fields to differentiate from the standard flex rows */
+    .source-summary-fields {
+        display: grid;
+        grid-template-columns: minmax(140px, max-content) 1fr;
+        gap: 10px 24px;
+        align-items: baseline;
+    }
+
+    /* Style for field headers (labels) */
+    .source-summary-fields dt {
+        font-weight: 700;
+        color: #6a7b95;
+        /* Soft dark slate color */
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.7px;
+    }
+
+    /* Style for field descriptions (values) */
+    .source-summary-fields dd {
+        margin: 0;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    /* Optional responsive tweak for smaller screens */
+    @media screen and (max-width: 600px) {
+        .source-summary-fields {
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+
+        .source-summary-fields dt {
+            margin-top: 6px;
+        }
+    }
+</style>
+<script src="{{ '/rism-online-renderer/js/rism-online-renderer.js' | relative_url }}"></script>
+
+<div id="work"></div>
+<div id="sources"></div>
+
+<script>
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    const lang = '{{ site.active_lang }}';
+    const baseUrl = getParameterByName('id').replace(/^rism:(.*)$/i, "https://rism.online/$1");
+    const sourcesUrl = baseUrl + '/sources';
+
+    // Render the work
+    const workRenderer = new RISMOnline.WorkRenderer(baseUrl, 'work');
+    workRenderer.render(lang);
+
+    var index = 1;
+
+    function getLocalizedValue(obj) {
+        if (!obj) return '';
+        return obj[lang] ?? obj['en'] ?? obj['none']?.[0] ?? '';
+    }
+
+    function renderSummaryCard(item, divId) {
+        const div = document.getElementById(divId);
+        const card = document.createElement('div');
+        card.className = 'source-summary-card';
+
+        const sectionLabel = document.createElement('div');
+        sectionLabel.className = `source-summary-label`;
+        sectionLabel.textContent = lang === 'de' ? `${index++}. Quellenübersicht` : `${index++}. Source Summary`;
+        card.appendChild(sectionLabel);
+
+        // Top-level label as title
+        const title = document.createElement('div');
+        title.className = 'source-summary-title';
+        title.textContent = getLocalizedValue(item.label);
+        card.appendChild(title);
+
+        // Summary key/value rows
+        if (item.summary) {
+            const table = document.createElement('dl');
+            table.className = 'source-summary-fields';
+
+            for (const key of Object.keys(item.summary)) {
+                const field = item.summary[key];
+                const label = getLocalizedValue(field.label);
+                const value = getLocalizedValue(field.value);
+                if (!label || !value) continue;
+
+                const dt = document.createElement('dt');
+                dt.textContent = label;
+                const dd = document.createElement('dd');
+                dd.textContent = value;
+
+                table.appendChild(dt);
+                table.appendChild(dd);
+            }
+
+            card.appendChild(table);
+        }
+
+        div.appendChild(card);
+    }
+
+    async function renderSources() {
+        try {
+            const response = await fetch(sourcesUrl, { headers: { Accept: "application/ld+json" } });
+            const data = await response.json();
+
+            if (!data?.items?.length) return;
+
+            const container = document.getElementById('sources');
+
+            // First pass: render all summary cards immediately so the user sees content right away
+            data.items.forEach((item, i) => {
+                const divId = `source-${i}`;
+                const div = document.createElement('div');
+                div.id = divId;
+                div.className = 'source-item';
+                container.appendChild(div);
+
+                renderSummaryCard(item, divId);
+            });
+
+            // Second pass: fetch and render each full source sequentially,
+            // which replaces/augments the summary card with full detail
+            for (let i = 0; i < data.items.length; i++) {
+                const divId = `source-${i}`;
+                await new RISMOnline.SourceRenderer(data.items[i].id, divId).render(lang);
+            }
+
+        } catch (err) {
+            console.error("Failed to load sources:", err);
+        }
+    }
+
+    renderSources();
+</script>
